@@ -1,0 +1,8 @@
+Session14-BT02-Phần 1
+- nếu không có Transaction, khi bước "Hoàn kho" bị lỗi (ví dụ: order.getProductId() trả về null), đơn hàng vẫn bị đổi trạng thái thành "CANCELLED" tại vì:
+	+ Nếu không sử dụng Transaction, các thao tác trong hàm sẽ được thực hiện một cách rời rạc theo cơ chế auto-commit. Điều này có nghĩa là ngay sau 
+	khi trạng thái đơn hàng được cập nhật thành "CANCELLED", thay đổi này có thể đã được ghi xuống cơ sở dữ liệu. Tuy nhiên, nếu ở bước tiếp theo xảy 
+	ra lỗi (ví dụ order.getProductId() trả về null khiến việc lấy sản phẩm thất bại), thì chương trình sẽ dừng lại mà không có cơ chế quay lui (rollback).
+	Kết quả là đơn hàng vẫn bị đánh dấu là đã hủy, nhưng số lượng sản phẩm trong kho lại không được hoàn trả. 
+- Điều này gây ra sự sai lệch dữ liệu nghiêm trọng: hệ thống nghĩ rằng hàng đã được trả lại kho nhưng thực tế thì không, dẫn đến tồn kho bị thiếu chính 
+xác, ảnh hưởng đến việc bán hàng và quản lý sau này.
